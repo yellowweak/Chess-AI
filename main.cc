@@ -1,12 +1,3 @@
-/*****************************************************************************\
- * Theory of Computer Games: Fall 2012
- * Chinese Dark Chess Search Engine Template by You-cheng Syu
- *
- * This file may not be used out of the class unless asking
- * for permission first.
- *
- * Modify by Hung-Jui Chang, December 2013
-\*****************************************************************************/
 #include<cstdio>
 #include<cstdlib>
 #include"anqi.hh"
@@ -51,14 +42,14 @@ SCORE depth_value(int dep);
 
 
 #ifdef _WINDOWS
-DWORD Tick;     // ¶}©l®É¨è
-int   TimeOut;  // ®É­­
+DWORD Tick;     // é–‹å§‹æ™‚åˆ»
+int   TimeOut;  // æ™‚é™
 #else
-clock_t Tick;     // ¶}©l®É¨è
-clock_t TimeOut;  // ®É­­
+clock_t Tick;     // é–‹å§‹æ™‚åˆ»
+clock_t TimeOut;  // æ™‚é™
 #endif
-MOV   BestMove; // ·j¥X¨Óªº³Ì¨ÎµÛªk
-int   root;		// search tree¸ÌrootªºÃC¦â
+MOV   BestMove; // æœå‡ºä¾†çš„æœ€ä½³è‘—æ³•
+int   root;		// search treeè£¡rootçš„é¡è‰²
 
 bool TimesUp() {
 #ifdef _WINDOWS
@@ -93,19 +84,19 @@ SCORE basic_value(const BOARD &B){
 
 SCORE dynamic_value(const BOARD &B){
 	int t=0;
-	// ºâ²Ä i Áû´Ñ¤l°ò¥»»ù­È
+	// ç®—ç¬¬ i é¡†æ£‹å­åŸºæœ¬åƒ¹å€¼
 	int bv[14];
 	for(int i=0; i<14; i++){
 		int tt=0;
 		
-		// i = ¯¥
+		// i = ç ²
 		if(i%7 == 5){
-			//§Ú¤è´Ñ¤l¼Æx4
+			//æˆ‘æ–¹æ£‹å­æ•¸x4
 			for(int j=((i/7)*7)%14; j<((i/7)*7)%14+7; j++)		tt += B.cnt[j] * 4;
-			//¹ï¤è´Ñ¤l¼Æx1
+			//å°æ–¹æ£‹å­æ•¸x1
 			for(int j=((i/7)*7+7)%14; j<((i/7)*7+7)%14+7; j++)	tt += B.cnt[j] * 1;
 			
-			//¤wÂ½
+			//å·²ç¿»
 			for(POS p=0; p<32; p++){
 				const CLR c = GetColor(B.fin[p]);
 				if(c != -1)		tt += (c == i/7)?	4:1;
@@ -114,19 +105,19 @@ SCORE dynamic_value(const BOARD &B){
 			bv[i] = tt;
 		}
 		
-		// i = «Ó
+		// i = å¸¥
 		else if(i%7 == 0){
 			tt += 1;
 			for(int j=((i/7)*7+7)%14; j<((i/7)*7+7)%14+7; j++){
 				if(B.cnt[j] > 0){
-					// j µLªk¤ÏÀ» «Ó (j LEVEL¬° 1~5)
+					// j ç„¡æ³•åæ“Š å¸¥ (j LEVELç‚º 1~5)
 					if(1 <= GetLevel(FIN(j)) && GetLevel(FIN(j)) <= 5)	tt += B.cnt[j] * 4;
-					// j ¥i¥H¤ÏÀ» «Ó (j LEVEL¬° 0)
+					// j å¯ä»¥åæ“Š å¸¥ (j LEVELç‚º 0)
 					else if(GetLevel(FIN(j)) == 0)					tt += B.cnt[j] * 1;
 				}
 			}
 			
-			//¤wÂ½
+			//å·²ç¿»
 			for(POS p=0; p<32; p++){
 				const CLR c = GetColor(B.fin[p]);
 				if(c != -1 && c != i/7 && 1 <= GetLevel(B.fin[p]) && GetLevel(B.fin[p]) <= 5)		tt += 4;
@@ -136,19 +127,19 @@ SCORE dynamic_value(const BOARD &B){
 			bv[i] = tt;
 		}
 		
-		// i = ¨ò
+		// i = å’
 		else if(i%7 == 6){
 			tt += 1;
 			for(int j=((i/7)*7+7)%14; j<((i/7)*7+7)%14+7; j++){
 				if(B.cnt[j] > 0){
-					// j µLªk¤ÏÀ» ¨ò (j LEVEL¬° 0)
+					// j ç„¡æ³•åæ“Š å’ (j LEVELç‚º 0)
 					if(GetLevel(FIN(j)) == 0)			tt += B.cnt[j] * 4;
-					// j ¥i¥H¤ÏÀ» ¨ò (j LEVEL¬° 6)
+					// j å¯ä»¥åæ“Š å’ (j LEVELç‚º 6)
 					else if(GetLevel(FIN(j)) == 6)		tt += B.cnt[j] * 1;
 				}
 			}
 			
-			//¤wÂ½
+			//å·²ç¿»
 			for(POS p=0; p<32; p++){
 				const CLR c = GetColor(B.fin[p]);
 				if(c != -1 && c != i/7 && GetLevel(B.fin[p]) == 0)		tt += 4;
@@ -157,19 +148,19 @@ SCORE dynamic_value(const BOARD &B){
 			bv[i] = tt;
 		}
 		
-		// i = ¨ä¥L
+		// i = å…¶ä»–
 		else{
 			tt += 1;
 			for(int j=((i/7)*7+7)%14; j<((i/7)*7+7)%14+7; j++){
 				if(B.cnt[j] > 0){
-					// j µLªk¤ÏÀ» i (j LEVEL¸û i °ª)
+					// j ç„¡æ³•åæ“Š i (j LEVELè¼ƒ i é«˜)
 					if(GetLevel(FIN(i)) < GetLevel(FIN(j)))		tt += B.cnt[j] * 4;
-					// j ¥i¥H¤ÏÀ» i (j »P i LEVEL¬Û¦P)
+					// j å¯ä»¥åæ“Š i (j èˆ‡ i LEVELç›¸åŒ)
 					else if(GetLevel(FIN(i)) == GetLevel(FIN(j)))	tt += B.cnt[j] * 1;
 				}
 			}
 			
-			//¤wÂ½
+			//å·²ç¿»
 			for(POS p=0; p<32; p++){
 				const CLR c = GetColor(B.fin[p]);
 				if(c != -1 && c != i/7 && GetLevel(FIN(i)) < GetLevel(B.fin[p]))			tt += 4;
@@ -194,29 +185,29 @@ SCORE dynamic_value(const BOARD &B){
 	for(int i=0; i<14; i++)	printf("%d", remain[i]);
 	printf("\n");
 	*/
-	//¨CÁû¤v¤è´Ñ¤l i ¤l¤O¬°¡u¯à¦Y¨ìªº©Ò¦³´Ñ¤l(©ú+·t) j °ò¥»»ù­ÈÁ`©M¡v
+	//æ¯é¡†å·±æ–¹æ£‹å­ i å­åŠ›ç‚ºã€Œèƒ½åƒåˆ°çš„æ‰€æœ‰æ£‹å­(æ˜+æš—) j åŸºæœ¬åƒ¹å€¼ç¸½å’Œã€
 	int dv = 0;
 	for(int i=(root)*7; i<(root)*7+7; i++){
 		//printf("dv= %d\n", dv);
-		// i = «Ó
+		// i = å¸¥
 		if(i%7 == 0){
 			for(int j=(root^1); j<(root^1)+7; j++){
 				if(0 <= j%7 && j%7 <= 5)	dv += remain[i]*remain[j]*bv[j]*rate[i%7];
 			}
 		}
-		// i = ¨ò
+		// i = å’
 		else if(i%7 == 6){
 			for(int j=(root^1); j<(root^1)+7; j++){
 				if(0 == j%7 || j%7 == 6)	dv += remain[i]*remain[j]*bv[j]*rate[i%7];
 			}
 		}
-		// i = ¯¥
+		// i = ç ²
 		else if(i%7 == 5){
 			for(int j=(root^1); j<(root^1)+7; j++){
 				dv += remain[i]*remain[j]*bv[j]*rate[i%7];
 			}
 		}
-		// i = ¨ä¥L
+		// i = å…¶ä»–
 		else{
 			for(int j=(root^1); j<(root^1)+7; j++){
 				if(GetLevel(FIN(i)) <= GetLevel(FIN(j)))	dv += remain[i]*remain[j]*bv[j]*rate[i%7];
@@ -224,29 +215,29 @@ SCORE dynamic_value(const BOARD &B){
 		}
 	}
 	
-	//¨CÁû¼Ä¤è´Ñ¤l i ¤l¤O¬°¡u¯à¦Y¨ìªº©Ò¦³´Ñ¤l(©ú+·t) j °ò¥»»ù­ÈÁ`©M¡v
+	//æ¯é¡†æ•µæ–¹æ£‹å­ i å­åŠ›ç‚ºã€Œèƒ½åƒåˆ°çš„æ‰€æœ‰æ£‹å­(æ˜+æš—) j åŸºæœ¬åƒ¹å€¼ç¸½å’Œã€
 	int dv2 = 0;
 	for(int i=(root^1)*7; i<(root^1)*7+7; i++){
 		//printf("dv2= %d, i= %d\n", dv2, i);
-		// i = «Ó
+		// i = å¸¥
 		if(i%7 == 0){
 			for(int j=(root); j<(root)+7; j++){
 				if(0 <= j%7 && j%7 <= 5)	dv2 += remain[i]*remain[j]*bv[j]*rate[i%7];
 			}
 		}
-		// i = ¨ò
+		// i = å’
 		else if(i%7 == 6){
 			for(int j=(root); j<(root)+7; j++){
 				if(0 == j%7 || j%7 == 6)	dv2 += remain[i]*remain[j]*bv[j]*rate[i%7];
 			}
 		}
-		// i = ¯¥
+		// i = ç ²
 		else if(i%7 == 5){
 			for(int j=(root); j<(root)+7; j++){
 				dv2 += remain[i]*remain[j]*bv[j]*rate[i%7];
 			}
 		}
-		// i = ¨ä¥L
+		// i = å…¶ä»–
 		else{
 			for(int j=(root); j<(root)+7; j++){
 				if(GetLevel(FIN(i)) <= GetLevel(FIN(j)))	dv2 += remain[i]*remain[j]*bv[j]*rate[i%7];
@@ -259,7 +250,7 @@ SCORE dynamic_value(const BOARD &B){
 	return dv-dv2;
 }
 
-//¦pªG¨S¦³³o¶µ¡A´NµLªk§â¹ï¤è§x¦º¦Y¤l
+//å¦‚æœæ²’æœ‰é€™é …ï¼Œå°±ç„¡æ³•æŠŠå°æ–¹å›°æ­»åƒå­
 SCORE attack_value(const BOARD &B){
 	int av = 0;
 	for(POS p=0; p<32; p++){
@@ -267,24 +258,24 @@ SCORE attack_value(const BOARD &B){
 		if(c != (root^1))	continue;
 		for(int i=0; i<4; i++){
 			if(ADJ[p][i]==-1)	continue;
-			//¦©±¼¼Ä¤è¡B¥¼Â½¡BªÅ®æ
+			//æ‰£æ‰æ•µæ–¹ã€æœªç¿»ã€ç©ºæ ¼
 			if(GetColor(B.fin[ADJ[p][i]]) != root)	continue;
-			//¯¥¬Û¾F®É¨S¦³§ğÀ»¤O
+			//ç ²ç›¸é„°æ™‚æ²’æœ‰æ”»æ“ŠåŠ›
 			if(B.fin[ADJ[p][i]]%7 == 5)	continue;
 			
-			//ÀË¬d¼Ä¤l¬O§_·|³Q³Q¤l¤O¸û¤jªº§Ú¤è©Ò¦Y
-			//¼Ä¤l¡G±N«Ó
+			//æª¢æŸ¥æ•µå­æ˜¯å¦æœƒè¢«è¢«å­åŠ›è¼ƒå¤§çš„æˆ‘æ–¹æ‰€åƒ
+			//æ•µå­ï¼šå°‡å¸¥
 			if(B.fin[p]==(root^1)*7 && B.fin[ADJ[p][i]] == root*7+6){
 				av += BASIC*rate[B.fin[p]%7];
 				break;
 			}
-			//¼Ä¤l¡G¨ä¥L
+			//æ•µå­ï¼šå…¶ä»–
 			if(B.fin[p]%7 != 0 && B.fin[p]%7>B.fin[ADJ[p][i]]%7){
 				av += BASIC*rate[B.fin[p]%7];
 				break;
 			}
 			
-			//¨SÀË¬d¼Ä¤l³Q§Ú¤è¯¥¦Y
+			//æ²’æª¢æŸ¥æ•µå­è¢«æˆ‘æ–¹ç ²åƒ
 		}
 	}
 	for(int i=0; i<repeat; i++)	printf("  ");
@@ -298,7 +289,7 @@ SCORE depth_value(int dep){
 	return dep*500;
 }
 
-// ¼f§½¨ç¼Æ
+// å¯©å±€å‡½æ•¸
 SCORE Eval(const BOARD &B, int dep) {
 	int yy = basic_value(B) /*+ dynamic_value(B)*/ + depth_value(dep) + eeeat*1000000;
 	if(eval_flag==0)	yy+=attack_value(B);
@@ -307,8 +298,8 @@ SCORE Eval(const BOARD &B, int dep) {
 	return yy;
 }
 
-// dep=²{¦b¦b²Ä´X¼h
-// cut=ÁÙ­n¦A¨«´X¼h
+// dep=ç¾åœ¨åœ¨ç¬¬å¹¾å±¤
+// cut=é‚„è¦å†èµ°å¹¾å±¤
 SCORE SearchNega(const BOARD &B,int dep,int cut, SCORE alpha, SCORE beta) {
 	if(B.ChkLose())return (dep%2 == 1)?		-WIN:+WIN;
 	MOVLST lst;
@@ -357,16 +348,16 @@ MOV Play(const BOARD &B) {
 	POS p; int c=0;
 	eval_flag = 0;
 	
-	// ·s¹CÀ¸¡HÀH¾÷Â½¤l
+	// æ–°éŠæˆ²ï¼Ÿéš¨æ©Ÿç¿»å­
 	if(B.who==-1){p=rand()%32;printf("%d\n",p);return MOV(p,p);}
 
 	/*
-	//§PÂ_´İ§½
+	//åˆ¤æ–·æ®˜å±€
 	endgame = 0;
 	for(POS p=0; p<32; p++)		if(B.fin[p] == 14)	endgame++;
 	*/
 	
-	// ­Y·j¥X¨Óªºµ²ªG·|¤ñ²{¦b¦n´N¥Î·j¥X¨Óªº¨«ªk
+	// è‹¥æœå‡ºä¾†çš„çµæœæœƒæ¯”ç¾åœ¨å¥½å°±ç”¨æœå‡ºä¾†çš„èµ°æ³•
 	clock_t start = clock();
 	
 	int ss = SearchNega(B,0,6,-INF, INF);
@@ -380,7 +371,7 @@ MOV Play(const BOARD &B) {
 		return BestMove;
 	}
 
-	// §_«hÀH«KÂ½¤@­Ó¦a¤è ¦ı¤p¤ß¥i¯à¤w¸g¨S¦a¤èÂ½¤F
+	// å¦å‰‡éš¨ä¾¿ç¿»ä¸€å€‹åœ°æ–¹ ä½†å°å¿ƒå¯èƒ½å·²ç¶“æ²’åœ°æ–¹ç¿»äº†
 	for(p=0;p<32;p++)if(B.fin[p]==FIN_X)c++;
 	if(c==0)return BestMove;
 	c=rand()%c;
@@ -464,7 +455,7 @@ int main(int argc, char* argv[]) {
 
 	FILE *fd;
 	MOV m;
-	if(turn) // §Ú¥ı
+	if(turn) // æˆ‘å…ˆ
 	{
 	    m = Play(B);
 	    sprintf(src, "%c%c",(m.st%4)+'a', m.st/4+'1');
@@ -481,7 +472,7 @@ int main(int argc, char* argv[]) {
 	    m.ed = (mov[2]=='(')?m.st:(mov[3] - 'a' + (mov[4] - '1')*4);
 	    B.DoMove(m, chess2fin(mov[3]));
 	}
-	else // ¹ï¤è¥ı
+	else // å°æ–¹å…ˆ
 	{
 	    protocol->recv(mov, remain_time);
 	    if( color == 2)
